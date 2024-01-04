@@ -25,12 +25,13 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     musicTitles = titles ?? []; // Ensure musicTitles is never null
     currentTrackIndex = musicUrls.indexOf(initialUrl);
     audioPlayer.positionStream.listen((event) {
+      //this is to prevent miniplayer from being visble initially
+      if(event.inMilliseconds==0){
+        return;
+      }
       emitChanges(musicUrls[currentTrackIndex]);
     });
-    audioPlayer.playingStream.listen((event) {
-      emitChanges(musicUrls[currentTrackIndex],paused: !event);
 
-    });
 
     // Event handlers
     on<LoadTrack>(_onLoadTrack);
@@ -63,10 +64,9 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
         );
       }
       _playlist = ConcatenatingAudioSource(children: audio_source);
-      await audioPlayer.setAudioSource(_playlist,initialIndex: currentIndex);
-      currentTrackIndex=currentIndex;
-      await audioPlayer.play();
-      emitChanges(musicUrls[currentIndex]);
+      await audioPlayer.setAudioSource(_playlist);
+
+      // emitChanges(musicUrls[currentIndex]);
     } catch (e) {
       print('Error loading or playing track: $e');
     }
