@@ -27,7 +27,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     currentTrackIndex = musicUrls.indexOf(initialUrl);
     audioPlayer.positionStream.listen((event) {
       //this is to prevent miniplayer from being visble initially
-      if(event.inMilliseconds==0){
+      if(!audioPlayer.playing){
         return;
       }
       emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
@@ -124,7 +124,19 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
 
   //this can be used to load a particular track.
   void _onLoadTrack(LoadTrack event, Emitter<custom.PlayerState> emit) async {
-
+    List<AudioSource> audio_source=[];
+    int currentIndex=0;
+    for(int i=0;i<musicUrls.length;i++){
+      if(event.url==musicUrls[i]){
+        currentIndex=i;
+      }
+      audio_source.add(
+          AudioSource.uri(Uri.parse(musicUrls[i]),tag:MediaItem(id: musicUrls[i], title: musicTitles[i],artUri: Uri.parse(playlistImage)))
+      );
+    }
+    _playlist = ConcatenatingAudioSource(children: audio_source);
+    await audioPlayer.setAudioSource(_playlist);
+    currentTrackIndex=currentIndex;
   }
 
   void _onPlayTrack(PlayTrack event, Emitter<custom.PlayerState> emit) async {
@@ -164,6 +176,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   void _onSetPlaybackSpeed(
       SetPlaybackSpeed event, Emitter<custom.PlayerState> emit) {
     audioPlayer.setSpeed(event.speed);
+    playbackSpeed=event.speed;
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
     emitChanges(musicUrls[currentTrackIndex]);
   }
