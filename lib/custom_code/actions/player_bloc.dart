@@ -16,6 +16,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   int currentTrackIndex = 0;
   double playbackSpeed = 1.0;
 
+
   PlayerBloc({
     required this.musicUrls,
     List<String>? titles,
@@ -29,7 +30,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
       if(event.inMilliseconds==0){
         return;
       }
-      emitChanges(musicUrls[currentTrackIndex]);
+      emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
     });
 
 
@@ -121,6 +122,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
         totalDuration: audioPlayer.duration ?? Duration.zero));
   }
 
+  //this can be used to load a particular track.
   void _onLoadTrack(LoadTrack event, Emitter<custom.PlayerState> emit) async {
 
   }
