@@ -4,23 +4,22 @@ import '/components/nav_bar1/nav_bar1_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:async';
-import '/custom_code/actions/index.dart' as actions;
-import '/custom_code/widgets/index.dart' as custom_widgets;
-import '/flutter_flow/random_data_util.dart' as random_data;
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import 'categories_model.dart';
 export 'categories_model.dart';
 
 class CategoriesWidget extends StatefulWidget {
   const CategoriesWidget({
-    super.key,
+    Key? key,
     required this.tracktest,
     required this.tracklisttest,
     required this.indextest,
-  });
+  }) : super(key: key);
 
   final String? tracktest;
   final List<String>? tracklisttest;
@@ -75,13 +74,13 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
-            borderRadius: 30.0,
-            borderWidth: 1.0,
-            buttonSize: 60.0,
-            icon: const Icon(
+            borderRadius: 30,
+            borderWidth: 1,
+            buttonSize: 60,
+            icon: Icon(
               Icons.arrow_back_rounded,
               color: Colors.white,
-              size: 30.0,
+              size: 30,
             ),
             onPressed: () async {
               context.pushNamed('Home');
@@ -92,19 +91,19 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
             style: FlutterFlowTheme.of(context).headlineMedium.override(
                   fontFamily: 'Noto Kufi Arabic',
                   color: Colors.white,
-                  fontSize: 22.0,
+                  fontSize: 22,
                 ),
           ),
-          actions: const [],
+          actions: [],
           centerTitle: true,
-          elevation: 2.0,
+          elevation: 2,
         ),
         body: SafeArea(
           top: true,
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 200.0, 0.0, 0.0),
+                padding: EdgeInsetsDirectional.fromSTEB(0, 200, 0, 0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -121,8 +120,8 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                           if (!snapshot.hasData) {
                             return Center(
                               child: SizedBox(
-                                width: 50.0,
-                                height: 50.0,
+                                width: 50,
+                                height: 50,
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     FlutterFlowTheme.of(context).primary,
@@ -134,11 +133,11 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                           List<TracksRecord> listViewTracksRecordList =
                               snapshot.data!;
                           return ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(
+                            padding: EdgeInsets.fromLTRB(
                               0,
                               0,
                               0,
-                              100.0,
+                              100,
                             ),
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
@@ -152,11 +151,6 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                 hoverColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
                                 onTap: () async {
-                                  unawaited(
-                                    () async {
-                                      await actions.stopAudio();
-                                    }(),
-                                  );
                                   setState(() {
                                     FFAppState().currentURL =
                                         listViewTracksRecord.audioUrl;
@@ -164,7 +158,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                         listViewTracksRecord.reference.id;
                                     FFAppState().trackList =
                                         (currentUserDocument?.userTracks
-                                                    .toList() ??
+                                                    ?.toList() ??
                                                 [])
                                             .map((e) => e.trackId)
                                             .toList()
@@ -191,7 +185,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                       ),
                                     }.withoutNulls,
                                     extra: <String, dynamic>{
-                                      kTransitionInfoKey: const TransitionInfo(
+                                      kTransitionInfoKey: TransitionInfo(
                                         hasTransition: true,
                                         transitionType: PageTransitionType.fade,
                                         duration: Duration(milliseconds: 0),
@@ -212,7 +206,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  height: 74.0,
+                                  height: 74,
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -225,8 +219,8 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                         children: [
                                           Padding(
                                             padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                    20.0, 0.0, 20.0, 0.0),
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    20, 0, 20, 0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -240,10 +234,10 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     Container(
-                                                      width: 65.0,
-                                                      height: 65.0,
+                                                      width: 65,
+                                                      height: 65,
                                                       decoration:
-                                                          const BoxDecoration(),
+                                                          BoxDecoration(),
                                                       child: Hero(
                                                         tag:
                                                             listViewTracksRecord
@@ -253,8 +247,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                         child: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
-                                                                  .circular(
-                                                                      8.0),
+                                                                  .circular(8),
                                                           child: Image.network(
                                                             listViewTracksRecord
                                                                 .audioThumbnail,
@@ -266,9 +259,8 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                   ],
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 0.0, 50.0, 0.0),
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(0, 0, 50, 0),
                                                   child: Column(
                                                     mainAxisSize:
                                                         MainAxisSize.max,
@@ -281,7 +273,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                     children: [
                                                       Container(
                                                         decoration:
-                                                            const BoxDecoration(),
+                                                            BoxDecoration(),
                                                         child: Text(
                                                           listViewTracksRecord
                                                               .title,
@@ -294,9 +286,8 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          10.0, 0.0, 0.0, 0.0),
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(10, 0, 0, 0),
                                                   child: Column(
                                                     mainAxisSize:
                                                         MainAxisSize.max,
@@ -310,7 +301,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                                                             FlutterFlowTheme.of(
                                                                     context)
                                                                 .secondaryText,
-                                                        size: 24.0,
+                                                        size: 24,
                                                       ),
                                                     ],
                                                   ),
@@ -328,91 +319,22 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                           );
                         },
                       ),
-                    ].divide(const SizedBox(height: 30.0)),
+                    ].divide(SizedBox(height: 30)),
                   ),
                 ),
               ),
               wrapWithModel(
                 model: _model.navBar1Model,
                 updateCallback: () => setState(() {}),
-                child: const NavBar1Widget(),
+                child: NavBar1Widget(),
               ),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(20.0, 50.0, 20.0, 0.0),
+                padding: EdgeInsetsDirectional.fromSTEB(20, 50, 20, 0),
                 child: Container(
                   width: double.infinity,
-                  height: 153.0,
+                  height: 153,
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).secondaryBackground,
-                  ),
-                  child: StreamBuilder<List<TracksRecord>>(
-                    stream: queryTracksRecord(),
-                    builder: (context, snapshot) {
-                      // Customize what your widget looks like when it's loading.
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: SizedBox(
-                            width: 50.0,
-                            height: 50.0,
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                FlutterFlowTheme.of(context).primary,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      List<TracksRecord> advanceMusicPlayerTracksRecordList =
-                          snapshot.data!;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 130.0,
-                        child: custom_widgets.AdvanceMusicPlayer(
-                          width: double.infinity,
-                          height: 130.0,
-                          initialUrl: FFAppState().currentURL,
-                          sliderActiveColor: const Color(0xFFE4AE6A),
-                          sliderInactiveColor:
-                              FlutterFlowTheme.of(context).primary,
-                          backwardIconPath: Icon(
-                            Icons.replay_10_sharp,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          forwardIconPath: Icon(
-                            Icons.forward_10_sharp,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          backwardIconColor: FlutterFlowTheme.of(context).error,
-                          forwardIconColor: FlutterFlowTheme.of(context).error,
-                          pauseIconPath: Icon(
-                            Icons.pause_sharp,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          playIconPath: Icon(
-                            Icons.play_arrow,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          pauseIconColor: FlutterFlowTheme.of(context).error,
-                          playIconColor: FlutterFlowTheme.of(context).error,
-                          playbackDurationTextColor:
-                              FlutterFlowTheme.of(context).error,
-                          previousIconPath: Icon(
-                            Icons.skip_previous,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          nextIconPath: Icon(
-                            Icons.skip_next_sharp,
-                            color: FlutterFlowTheme.of(context).error,
-                          ),
-                          previousIconColor: FlutterFlowTheme.of(context).error,
-                          nextIconColor: FlutterFlowTheme.of(context).error,
-                          startPositionMillis: 0.0,
-                          musicUrls: List.generate(
-                              random_data.randomInteger(0, 0),
-                              (index) => random_data.randomName(true, false)),
-                        ),
-                      );
-                    },
                   ),
                 ),
               ),
