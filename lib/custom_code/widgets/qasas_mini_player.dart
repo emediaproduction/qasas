@@ -92,7 +92,8 @@ class _QasasMiniPlayerState extends State<QasasMiniPlayer> {
   Slider _buildSlider(
       Duration currentPosition, Duration totalDuration, BuildContext context) {
     return Slider(
-      value: currentPosition.inSeconds.toDouble(),
+      value: currentPosition.inSeconds.toDouble()<=totalDuration.inSeconds.toDouble()?currentPosition.inSeconds.toDouble():0,
+      min: 0,
       max: totalDuration.inSeconds.toDouble(),
       onChanged: (value) {
         context

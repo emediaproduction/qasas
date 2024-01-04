@@ -24,6 +24,13 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   }) : super(custom.PlayerInitial()) {
     musicTitles = titles ?? []; // Ensure musicTitles is never null
     currentTrackIndex = musicUrls.indexOf(initialUrl);
+    audioPlayer.positionStream.listen((event) {
+      emitChanges(musicUrls[currentTrackIndex]);
+    });
+    audioPlayer.playingStream.listen((event) {
+      emitChanges(musicUrls[currentTrackIndex],paused: !event);
+
+    });
 
     // Event handlers
     on<LoadTrack>(_onLoadTrack);
@@ -41,27 +48,25 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
         _onInitializePlayer); // Added event handler for InitializePlayer
   }
 
-  Future<void> initializePlayer({
-    required String initialUrl,
-    required List<String> urls,
-    required List<String> titles,
-    required String image,
-  }) async {
-    this.musicUrls = urls;
-    this.musicTitles = titles;
-    this.playlistImage = image;
-    this.currentTrackIndex = musicUrls.indexOf(initialUrl);
 
-    _loadAndPlayTrack(initialUrl); // Load and play the initial track;
-  }
 
   Future<void> _loadAndPlayTrack(String url) async {
     try {
-      var source = AudioSource.uri(Uri.parse(url), tag: playlistImage);
-      _playlist = ConcatenatingAudioSource(children: [source]);
-      await audioPlayer.setAudioSource(_playlist);
+      List<AudioSource> audio_source=[];
+      int currentIndex=0;
+      for(int i=0;i<musicUrls.length;i++){
+        if(url==musicUrls[i]){
+          currentIndex=i;
+        }
+        audio_source.add(
+          AudioSource.uri(Uri.parse(musicUrls[i]),tag:MediaItem(id: musicUrls[i], title: musicTitles[i],artUri: Uri.parse(playlistImage)))
+        );
+      }
+      _playlist = ConcatenatingAudioSource(children: audio_source);
+      await audioPlayer.setAudioSource(_playlist,initialIndex: currentIndex);
+      currentTrackIndex=currentIndex;
       await audioPlayer.play();
-      _updateMediaItemAndState(url);
+      emitChanges(musicUrls[currentIndex]);
     } catch (e) {
       print('Error loading or playing track: $e');
     }
@@ -77,28 +82,30 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     this.musicTitles = event.musicTitles;
     this.playlistImage = event.playlistImage;
     // Any additional initialization logic
+    _loadAndPlayTrack(event.initialUrl);
   }
 
-  // This function needs to emit states to reflect changes
-  void _updateMediaItemAndState(String url, {bool paused = false}) async {
-    int index = musicUrls.indexOf(url);
-    String title =
-        index != -1 && index < musicTitles.length ? musicTitles[index] : '';
-    MediaItem item =
-        MediaItem(id: url, title: title, artUri: Uri.parse(playlistImage));
 
-    var source = AudioSource.uri(Uri.parse(url), tag: item);
-    _playlist = ConcatenatingAudioSource(children: [source]);
-    await audioPlayer.setAudioSource(source);
-    currentTrackIndex=0;
-
-    if(!paused){
-      await audioPlayer.play();
-    }
-
-
-    emitChanges(url,paused: paused);
-  }
+  // // This function needs to emit states to reflect changes
+  // void _updateMediaItemAndState(String url, {bool paused = false}) async {
+  //   int index = musicUrls.indexOf(url);
+  //   String title =
+  //       index != -1 && index < musicTitles.length ? musicTitles[index] : '';
+  //   MediaItem item =
+  //       MediaItem(id: url, title: title, artUri: Uri.parse(playlistImage));
+  //
+  //   var source = AudioSource.uri(Uri.parse(url), tag: item);
+  //   _playlist = ConcatenatingAudioSource(children: [source]);
+  //   await audioPlayer.setAudioSource(source);
+  //   currentTrackIndex=0;
+  //
+  //   if(!paused){
+  //     await audioPlayer.play();
+  //   }
+  //
+  //
+  //   emitChanges(url,paused: paused);
+  // }
 
   void emitChanges(String url, {bool paused = false}){
     emit(paused
@@ -115,11 +122,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   }
 
   void _onLoadTrack(LoadTrack event, Emitter<custom.PlayerState> emit) async {
-    // var source = AudioSource.uri(Uri.parse(event.url), tag: event.imageUrl);
-    // _playlist = ConcatenatingAudioSource(children: [source]);
-    // await audioPlayer.setAudioSource(_playlist);
-    // currentTrackIndex = 0; // Assuming this is the first track
-    _updateMediaItemAndState(event.url,paused: true);
+
   }
 
   void _onPlayTrack(PlayTrack event, Emitter<custom.PlayerState> emit) async {
@@ -146,9 +149,14 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
 
   void _onChangeTrack(
       ChangeTrack event, Emitter<custom.PlayerState> emit) async {
-    await audioPlayer.setUrl(event.url);
+
+
     currentTrackIndex = musicUrls.indexOf(event.url);
-    _updateMediaItemAndState(event.url);
+    print("Track Changed ${event.url} ${currentTrackIndex}");
+    await audioPlayer.seek(Duration.zero,index: currentTrackIndex);
+    await audioPlayer.play();
+    // _updateMediaItemAndState(event.url);
+    emitChanges(event.url);
   }
 
   void _onSetPlaybackSpeed(
@@ -175,8 +183,8 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   void _onNextTrack(NextTrack event, Emitter<custom.PlayerState> emit) async {
     currentTrackIndex = (currentTrackIndex + 1) % musicUrls.length;
     String nextTrackUrl = musicUrls[currentTrackIndex];
-    await audioPlayer.setUrl(nextTrackUrl);
-    _updateMediaItemAndState(nextTrackUrl);
+    await audioPlayer.seek(Duration.zero,index: currentTrackIndex);
+    emitChanges(nextTrackUrl);
   }
 
   void _onPreviousTrack(
@@ -184,7 +192,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     currentTrackIndex =
         currentTrackIndex > 0 ? currentTrackIndex - 1 : musicUrls.length - 1;
     String previousTrackUrl = musicUrls[currentTrackIndex];
-    await audioPlayer.setUrl(previousTrackUrl);
-    _updateMediaItemAndState(previousTrackUrl);
+    await audioPlayer.seek(Duration.zero,index: currentTrackIndex);
+    emitChanges(previousTrackUrl);
   }
 }

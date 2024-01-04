@@ -63,6 +63,7 @@ class _QasasPlayerState extends State<QasasPlayer> {
         bool isPlaying = state is PlayerPlaying;
         Duration currentPosition = state.position;
         Duration totalDuration = state.totalDuration;
+        // print(currentPosition);
 
         return Container(
           width: widget.width,
@@ -84,7 +85,7 @@ class _QasasPlayerState extends State<QasasPlayer> {
   Slider _buildTrackProgressSlider(
       Duration currentPosition, Duration totalDuration) {
     return Slider(
-      value: currentPosition.inMilliseconds.toDouble(),
+      value: currentPosition.inMilliseconds.toDouble()<=totalDuration.inMilliseconds.toDouble()?currentPosition.inMilliseconds.toDouble():0,
       min: 0,
       max: totalDuration.inMilliseconds.toDouble(),
       onChanged: (value) {
@@ -157,10 +158,14 @@ class _QasasPlayerState extends State<QasasPlayer> {
 
     return DropdownButton<String>(
       value: currentSpeed,
-      onChanged: (newSpeed) => _handleSpeedChange(newSpeed),
+      onChanged:  (newSpeed){
+        currentSpeed=newSpeed.toString();
+        _handleSpeedChange(newSpeed);
+      },
       items: speedValues.keys.map((String value) {
         return DropdownMenuItem<String>(
           value: value,
+
           child: Text(value),
         );
       }).toList(),
