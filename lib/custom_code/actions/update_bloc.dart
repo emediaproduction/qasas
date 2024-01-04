@@ -30,5 +30,6 @@ Future<void> updateBloc(
   ));
 
   // Play the initial track
-  playerBloc.add(PlayTrack(url: initialUrl, imageUrl: playlistImage));
+  playerBloc.add(LoadTrack(url: initialUrl, imageUrl: playlistImage));
+  playerBloc.add(PlayTrack(url: initialUrl,imageUrl: playlistImage));
 }

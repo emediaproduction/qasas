@@ -7,6 +7,7 @@ import 'audio_player_singleton.dart';
 
 class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   final AudioPlayer audioPlayer = AudioPlayerSingleton().audioPlayer;
+  final BaseAudioHandler baseAudioHandler = BaseAudioHandler();
   late ConcatenatingAudioSource _playlist;
   List<String> musicUrls;
   List<String> musicTitles = []; // Initialized to an empty list
@@ -79,49 +80,56 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   }
 
   // This function needs to emit states to reflect changes
-  void _updateMediaItemAndState(String url, {bool paused = false}) {
+  void _updateMediaItemAndState(String url, {bool paused = false}) async {
     int index = musicUrls.indexOf(url);
     String title =
         index != -1 && index < musicTitles.length ? musicTitles[index] : '';
+    MediaItem item =
+        MediaItem(id: url, title: title, artUri: Uri.parse(playlistImage));
 
-    AudioServiceBackground.setMediaItem(
-        MediaItem(id: url, title: title, artUri: Uri.parse(playlistImage)));
-    AudioServiceBackground.setState(
-        playing: !paused,
-        controls: paused
-            ? [MediaControl.play, MediaControl.stop]
-            : [MediaControl.pause, MediaControl.stop]);
+    var source = AudioSource.uri(Uri.parse(url), tag: item);
+    _playlist = ConcatenatingAudioSource(children: [source]);
+    await audioPlayer.setAudioSource(source);
+    currentTrackIndex=0;
 
-    // Emitting the state is crucial here
+    if(!paused){
+      await audioPlayer.play();
+    }
+
+
+    emitChanges(url,paused: paused);
+  }
+
+  void emitChanges(String url, {bool paused = false}){
     emit(paused
         ? custom.PlayerPaused(
-            currentTrack: url,
-            trackImageUrl: playlistImage,
-            position: audioPlayer.position,
-            totalDuration: audioPlayer.duration ?? Duration.zero)
+        currentTrack: url,
+        trackImageUrl: playlistImage,
+        position: audioPlayer.position,
+        totalDuration: audioPlayer.duration ?? Duration.zero)
         : custom.PlayerPlaying(
-            currentTrack: url,
-            trackImageUrl: playlistImage,
-            position: audioPlayer.position,
-            totalDuration: audioPlayer.duration ?? Duration.zero));
+        currentTrack: url,
+        trackImageUrl: playlistImage,
+        position: audioPlayer.position,
+        totalDuration: audioPlayer.duration ?? Duration.zero));
   }
 
   void _onLoadTrack(LoadTrack event, Emitter<custom.PlayerState> emit) async {
-    var source = AudioSource.uri(Uri.parse(event.url), tag: event.imageUrl);
-    _playlist = ConcatenatingAudioSource(children: [source]);
-    await audioPlayer.setAudioSource(_playlist);
-    currentTrackIndex = 0; // Assuming this is the first track
-    _updateMediaItemAndState(event.url);
+    // var source = AudioSource.uri(Uri.parse(event.url), tag: event.imageUrl);
+    // _playlist = ConcatenatingAudioSource(children: [source]);
+    // await audioPlayer.setAudioSource(_playlist);
+    // currentTrackIndex = 0; // Assuming this is the first track
+    _updateMediaItemAndState(event.url,paused: true);
   }
 
   void _onPlayTrack(PlayTrack event, Emitter<custom.PlayerState> emit) async {
     await audioPlayer.play();
-    _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    emitChanges(musicUrls[currentTrackIndex]);
   }
 
   void _onPauseTrack(PauseTrack event, Emitter<custom.PlayerState> emit) {
     audioPlayer.pause();
-    _updateMediaItemAndState(musicUrls[currentTrackIndex], paused: true);
+    emitChanges(musicUrls[currentTrackIndex], paused: true);
   }
 
   void _onStopTrack(StopTrack event, Emitter<custom.PlayerState> emit) {
@@ -132,7 +140,8 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   void _onUpdatePosition(
       UpdatePosition event, Emitter<custom.PlayerState> emit) {
     audioPlayer.seek(event.position);
-    _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    
+    emitChanges(musicUrls[currentTrackIndex]);
   }
 
   void _onChangeTrack(
@@ -145,19 +154,22 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   void _onSetPlaybackSpeed(
       SetPlaybackSpeed event, Emitter<custom.PlayerState> emit) {
     audioPlayer.setSpeed(event.speed);
-    _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    emitChanges(musicUrls[currentTrackIndex]);
   }
 
   void _onSkipForward(SkipForward event, Emitter<custom.PlayerState> emit) {
     final newPosition = audioPlayer.position + Duration(seconds: event.seconds);
     audioPlayer.seek(newPosition);
-    _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    emitChanges(musicUrls[currentTrackIndex]);
+    // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
 
   void _onSkipBackward(SkipBackward event, Emitter<custom.PlayerState> emit) {
     final newPosition = audioPlayer.position - Duration(seconds: event.seconds);
     audioPlayer.seek(newPosition);
-    _updateMediaItemAndState(musicUrls[currentTrackIndex]);
+    emitChanges(musicUrls[currentTrackIndex]);
+    // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
 
   void _onNextTrack(NextTrack event, Emitter<custom.PlayerState> emit) async {
