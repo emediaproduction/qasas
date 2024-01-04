@@ -31,9 +31,9 @@ void main() async {
         Provider<PlayerBloc>(
           create: (context) => PlayerBloc(
             musicUrls: [
-              'https://firebasestorage.googleapis.com/v0/b/music-player-93920.appspot.com/o/users%2Fmusic_audio%2Funlock-me-149058.mp3?alt=media&token=831ae47e-bc26-4ca1-94e3-a68ad218a852',
-              'https://firebasestorage.googleapis.com/v0/b/music-player-93920.appspot.com/o/users%2Fmusic_audio%2Frelax-hip-hop-music-for-short-vlog-videos-40-seconds-ackground-drama-155719.mp3?alt=media&token=e782f0e8-4cc4-4d46-983f-5c068faf830b',
-              'https://firebasestorage.googleapis.com/v0/b/music-player-93920.appspot.com/o/users%2Fmusic_audio%2Fpowerful-beat-121791.mp3?alt=media&token=00f3ebb4-0b88-4d9e-8ac1-fbffef5c1f0c',
+              'https://firebasestorage.googleapis.com/v0/b/qasasapp.appspot.com/o/users%2FfOXq1u3t0tX6PmLfdAIyRp4qxEo2%2Fuploads%2F1703717170915000_0.mp3?alt=media&token=cb103b00-b823-4b7a-9ac8-de905a6649d9',
+              'https://firebasestorage.googleapis.com/v0/b/qasasapp.appspot.com/o/users%2FfOXq1u3t0tX6PmLfdAIyRp4qxEo2%2Fuploads%2F1703717170915000_1.mp3?alt=media&token=e2d89aa7-15ad-42c6-af72-ef6657db93da',
+              'https://firebasestorage.googleapis.com/v0/b/qasasapp.appspot.com/o/users%2FfOXq1u3t0tX6PmLfdAIyRp4qxEo2%2Fuploads%2F1703717170915000_2.mp3?alt=media&token=7cc477a5-e5e9-4322-8523-2002bee96e9d',
             ],
             titles: [
               'test track 1',
@@ -41,7 +41,7 @@ void main() async {
               'test track 3',
             ],
             initialUrl:
-                'https://firebasestorage.googleapis.com/v0/b/music-player-93920.appspot.com/o/users%2Fmusic_audio%2Frelax-hip-hop-music-for-short-vlog-videos-40-seconds-ackground-drama-155719.mp3?alt=media&token=e782f0e8-4cc4-4d46-983f-5c068faf830b',
+                'https://firebasestorage.googleapis.com/v0/b/qasasapp.appspot.com/o/users%2FfOXq1u3t0tX6PmLfdAIyRp4qxEo2%2Fuploads%2F1703717160888000.mp3?alt=media&token=61b7c3a5-ce89-4475-9f95-071a5d44b092',
             playlistImage:
                 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/new-qasas-f219mx/assets/3tgx6hyivp6h/NEW2_LOGO-PWA-512-Noa.png',
           ),
