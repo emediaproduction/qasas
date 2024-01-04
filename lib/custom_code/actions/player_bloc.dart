@@ -65,7 +65,8 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
         );
       }
       _playlist = ConcatenatingAudioSource(children: audio_source);
-      await audioPlayer.setAudioSource(_playlist);
+      await audioPlayer.setAudioSource(_playlist,initialIndex: currentIndex);
+      currentTrackIndex=currentIndex;
 
       // emitChanges(musicUrls[currentIndex]);
     } catch (e) {
@@ -144,19 +145,19 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     emitChanges(musicUrls[currentTrackIndex]);
   }
 
-  void _onPauseTrack(PauseTrack event, Emitter<custom.PlayerState> emit) {
-    audioPlayer.pause();
+  void _onPauseTrack(PauseTrack event, Emitter<custom.PlayerState> emit) async{
+    await audioPlayer.pause();
     emitChanges(musicUrls[currentTrackIndex], paused: true);
   }
 
-  void _onStopTrack(StopTrack event, Emitter<custom.PlayerState> emit) {
-    audioPlayer.stop();
+  void _onStopTrack(StopTrack event, Emitter<custom.PlayerState> emit) async{
+    await audioPlayer.stop();
     emit(custom.PlayerStopped());
   }
 
   void _onUpdatePosition(
-      UpdatePosition event, Emitter<custom.PlayerState> emit) {
-    audioPlayer.seek(event.position);
+      UpdatePosition event, Emitter<custom.PlayerState> emit) async{
+    await audioPlayer.seek(event.position);
     
     emitChanges(musicUrls[currentTrackIndex]);
   }
@@ -174,24 +175,25 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
   }
 
   void _onSetPlaybackSpeed(
-      SetPlaybackSpeed event, Emitter<custom.PlayerState> emit) {
-    audioPlayer.setSpeed(event.speed);
+      SetPlaybackSpeed event, Emitter<custom.PlayerState> emit) async{
+    await audioPlayer.setSpeed(event.speed);
     playbackSpeed=event.speed;
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
-    emitChanges(musicUrls[currentTrackIndex]);
+
+    emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
   }
 
-  void _onSkipForward(SkipForward event, Emitter<custom.PlayerState> emit) {
+  void _onSkipForward(SkipForward event, Emitter<custom.PlayerState> emit) async{
     final newPosition = audioPlayer.position + Duration(seconds: event.seconds);
-    audioPlayer.seek(newPosition);
-    emitChanges(musicUrls[currentTrackIndex]);
+    await audioPlayer.seek(newPosition);
+    emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
 
-  void _onSkipBackward(SkipBackward event, Emitter<custom.PlayerState> emit) {
+  void _onSkipBackward(SkipBackward event, Emitter<custom.PlayerState> emit) async{
     final newPosition = audioPlayer.position - Duration(seconds: event.seconds);
-    audioPlayer.seek(newPosition);
-    emitChanges(musicUrls[currentTrackIndex]);
+    await audioPlayer.seek(newPosition);
+    emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
 
@@ -199,7 +201,9 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
     currentTrackIndex = (currentTrackIndex + 1) % musicUrls.length;
     String nextTrackUrl = musicUrls[currentTrackIndex];
     await audioPlayer.seek(Duration.zero,index: currentTrackIndex);
+    await audioPlayer.play();
     emitChanges(nextTrackUrl);
+
   }
 
   void _onPreviousTrack(
@@ -208,6 +212,7 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
         currentTrackIndex > 0 ? currentTrackIndex - 1 : musicUrls.length - 1;
     String previousTrackUrl = musicUrls[currentTrackIndex];
     await audioPlayer.seek(Duration.zero,index: currentTrackIndex);
+    await audioPlayer.play();
     emitChanges(previousTrackUrl);
   }
 }
