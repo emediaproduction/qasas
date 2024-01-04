@@ -185,14 +185,16 @@ class PlayerBloc extends Bloc<PlayerEvent, custom.PlayerState> {
 
   void _onSkipForward(SkipForward event, Emitter<custom.PlayerState> emit) async{
     final newPosition = audioPlayer.position + Duration(seconds: event.seconds);
-    await audioPlayer.seek(newPosition);
+
+    await audioPlayer.seek((newPosition.compareTo(audioPlayer.duration?? Duration.zero))>0?audioPlayer.duration??Duration.zero:newPosition);
     emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
 
   void _onSkipBackward(SkipBackward event, Emitter<custom.PlayerState> emit) async{
     final newPosition = audioPlayer.position - Duration(seconds: event.seconds);
-    await audioPlayer.seek(newPosition);
+
+    await audioPlayer.seek((newPosition.isNegative)?Duration.zero:newPosition);
     emitChanges(musicUrls[currentTrackIndex],paused: !audioPlayer.playing);
     // _updateMediaItemAndState(musicUrls[currentTrackIndex]);
   }
