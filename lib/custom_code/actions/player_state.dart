@@ -59,3 +59,17 @@ class PlayerStopped extends PlayerState {
           totalDuration: Duration.zero,
         );
 }
+
+class PlayerLoading extends PlayerState {
+  PlayerLoading({
+    required String currentTrack,
+    required String trackImageUrl,
+    required Duration position,
+    required Duration totalDuration,
+  }) : super(
+          currentTrack: currentTrack,
+          trackImageUrl: trackImageUrl,
+          position: position,
+          totalDuration: totalDuration,
+        );
+}

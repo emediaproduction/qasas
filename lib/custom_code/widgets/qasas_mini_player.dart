@@ -58,19 +58,77 @@ class _QasasMiniPlayerState extends State<QasasMiniPlayer> {
     }
 
     String trackTitle = state.currentTrack;
+    String imageUrl = state.trackImageUrl;
     Duration currentPosition = state.position;
     Duration totalDuration = state.totalDuration;
     bool isPlaying = state is PlayerPlaying;
 
     return Container(
+      key: ValueKey<String>(trackTitle), // Key to force rebuild on title change
       width: widget.width,
       height: widget.height,
       decoration: _playerDecoration(),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildSlider(currentPosition, totalDuration, context),
-          _buildControlRow(trackTitle, isPlaying, context),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                  color: Colors.white,
+                  onPressed: () {
+                    if (isPlaying) {
+                      context.read<PlayerBloc>().add(PauseTrack());
+                    } else {
+                      context
+                          .read<PlayerBloc>()
+                          .add(PlayTrack(url: trackTitle, imageUrl: imageUrl));
+                    }
+                  },
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 8, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional(1, 0),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 8, 8, 0),
+                            child: Text(
+                              trackTitle,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            imageUrl,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -89,51 +147,28 @@ class _QasasMiniPlayerState extends State<QasasMiniPlayer> {
     );
   }
 
-  Slider _buildSlider(
+  SliderTheme _buildSlider(
       Duration currentPosition, Duration totalDuration, BuildContext context) {
-    return Slider(
-      value: currentPosition.inSeconds.toDouble()<=totalDuration.inSeconds.toDouble()?currentPosition.inSeconds.toDouble():0,
-      min: 0,
-      max: totalDuration.inSeconds.toDouble(),
-      onChanged: (value) {
-        context
-            .read<PlayerBloc>()
-            .add(UpdatePosition(position: Duration(seconds: value.toInt())));
-      },
-      activeColor: Colors.white,
-      inactiveColor: Colors.grey[800],
-    );
-  }
-
-  Padding _buildControlRow(
-      String trackTitle, bool isPlaying, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              trackTitle,
-              style: const TextStyle(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-            color: Colors.white,
-            onPressed: () {
-              if (isPlaying) {
-                context.read<PlayerBloc>().add(PauseTrack());
-              } else {
-                // Ensure to provide the correct URL and Image URL for playing the track
-                context.read<PlayerBloc>().add(PlayTrack(
-                    url: trackTitle,
-                    imageUrl: context.read<PlayerBloc>().playlistImage));
-              }
-            },
-          ),
-        ],
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        trackHeight: 2.0,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 0.0),
+        activeTrackColor: Colors.green,
+        inactiveTrackColor: Colors.grey[800],
+      ),
+      child: Slider(
+        value: currentPosition.inSeconds.toDouble() <=
+                totalDuration.inSeconds.toDouble()
+            ? currentPosition.inSeconds.toDouble()
+            : 0,
+        min: 0,
+        max: totalDuration.inSeconds.toDouble(),
+        onChanged: (value) {
+          context
+              .read<PlayerBloc>()
+              .add(UpdatePosition(position: Duration(seconds: value.toInt())));
+        },
       ),
     );
   }
