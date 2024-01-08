@@ -1,6 +1,6 @@
 # NEW QASAS
 
-A new Flutter project.
+Qasas Project
 
 ## Getting Started
 
